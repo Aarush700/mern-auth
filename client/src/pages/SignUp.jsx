@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function SignUp() {
     const [formData, setFormData] = useState({});
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         setFormData({
@@ -29,16 +30,15 @@ function SignUp() {
 
             const data = await res.json();
 
-
             if (!res.ok) {
-                throw new Error(data.message || 'Signup failed');
+                throw new Error(data.message || "Signup failed");
             }
 
+            console.log("Signup successful:", data);
 
-            console.log('Signup successful:', data);
-
+            navigate("/");
         } catch (error) {
-            console.error('Signup error:', error);
+            console.error("Signup error:", error);
             setError(true);
         } finally {
             setLoading(false);
@@ -75,7 +75,7 @@ function SignUp() {
                     type="submit"
                     className="bg-slate-700 text-white p-3 rounded-lg hover:opacity-95 disabled:opacity-80"
                 >
-                    {loading ? 'Loading...' : 'Sign Up'}
+                    {loading ? "Loading..." : "Sign Up"}
                 </button>
             </form>
             <div className="flex gap-2 mt-5">
