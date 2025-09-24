@@ -17,7 +17,7 @@ function SignUp() {
         e.preventDefault();
         try {
             setLoading(true);
-            setError(false); // Reset error state before making request
+            setError(false);
 
             const res = await fetch("/api/auth/signup", {
                 method: "POST",
@@ -29,19 +29,19 @@ function SignUp() {
 
             const data = await res.json();
 
-            // Check if the response was successful
+
             if (!res.ok) {
                 throw new Error(data.message || 'Signup failed');
             }
 
-            // Handle successful signup here
+
             console.log('Signup successful:', data);
 
         } catch (error) {
             console.error('Signup error:', error);
             setError(true);
         } finally {
-            setLoading(false); // Always set loading to false
+            setLoading(false);
         }
     };
 
