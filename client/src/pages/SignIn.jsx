@@ -6,6 +6,7 @@ import {
     signInFailure,
 } from "../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
+import OAuth from "../components/OAuth";
 
 function SignIn() {
     const [formData, setFormData] = useState({});
@@ -75,10 +76,11 @@ function SignIn() {
                 <button
                     disabled={loading}
                     type="submit"
-                    className="bg-slate-700 text-white p-3 rounded-lg hover:opacity-95 disabled:opacity-80"
+                    className="bg-slate-700 text-white p-3 rounded-lg hover:opacity-95 disabled:opacity-80 cursor-pointer"
                 >
                     {loading ? "Loading..." : "Sign In"}
                 </button>
+                <OAuth />
             </form>
             <div className="flex gap-2 mt-5">
                 <p>New user?</p>
@@ -86,11 +88,11 @@ function SignIn() {
                     <span className="text-blue-500">Sign Up</span>
                 </Link>
             </div>
-            <p className="text-red-700 mt-5">
-                {error
-                    ? error || "Something went wrong, try again in a few minutes!"
-                    : ""}
-            </p>
+            {error && (
+                <p className="text-red-700 mt-5">
+                    {error}
+                </p>
+            )}
         </div>
     );
 }
