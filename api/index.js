@@ -24,7 +24,8 @@ app.use("/api/auth", authRoutes);
 app.use(express.static(path.join(__dirname, "client/dist")));
 
 // Catch-all for React routes (must be after API routes)
-app.get("*", (req, res) => {
+// Fixed: Use "/*" instead of "*" for compatibility with newer path-to-regexp versions
+app.get("/*", (req, res) => {
   res.sendFile(path.join(__dirname, "client/dist/index.html"));
 });
 
