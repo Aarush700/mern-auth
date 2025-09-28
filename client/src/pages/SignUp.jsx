@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import OAuth from "../components/OAuth";
+import { useDispatch } from "react-redux";
+import { signInSuccess } from "../redux/user/userSlice";
 
 function SignUp() {
     const [formData, setFormData] = useState({});
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handleChange = (e) => {
         setFormData({
@@ -23,9 +26,7 @@ function SignUp() {
 
             const res = await fetch("/api/auth/signup", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
             });
 
@@ -35,9 +36,27 @@ function SignUp() {
                 throw new Error(data.message || "Signup failed");
             }
 
-            console.log("Signup successful:", data);
+            // Automatically sign in after signup
+            const signinRes = await fetch("/api/auth/signin", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: formData.email,
+                    password: formData.password,
+                }),
+                credentials: "include", // include cookie if using JWT cookies
+            });
 
-            navigate("/");
+            const userData = await signinRes.json();
+
+            if (!signinRes.ok) {
+                throw new Error(userData.message || "Signin failed");
+            }
+
+            // Update Redux
+            dispatch(signInSuccess(userData));
+
+            navigate("/"); // now navbar will show profile
         } catch (error) {
             console.error("Signup error:", error);
             setError(true);
