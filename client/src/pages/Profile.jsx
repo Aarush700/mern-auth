@@ -4,6 +4,10 @@ import {
     updateUserStart,
     updateUserFailure,
     updateUserSuccess,
+    deleteUserFailure,
+    deleteUserStart,
+    deleteUserSuccess,
+    signOut,
 } from "../redux/user/userSlice";
 
 function Profile() {
@@ -36,7 +40,7 @@ function Profile() {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
-                credentials: "include"
+                credentials: "include",
             });
 
             const data = await res.json();
@@ -55,6 +59,46 @@ function Profile() {
         }
     };
 
+    const handleDeleteAccount = async () => {
+        if (!window.confirm("Are you sure you want to delete your account?"))
+            return;
+
+        setError("");
+        setSuccess("");
+        setLoading(true);
+        dispatch(deleteUserStart());
+
+        try {
+            const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+                method: "DELETE",
+                credentials: "include",
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                dispatch(deleteUserSuccess());
+                setSuccess("Account deleted successfully!");
+                navigate;
+            } else {
+                dispatch(deleteUserFailure(data));
+                setError(data.message || "Delete failed");
+            }
+        } catch (error) {
+            dispatch(deleteUserFailure(error.message));
+            setError("Something went wrong. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSignOut = async () => {
+        try {
+            await fetch("/api/user/signout");
+            dispatch(signOut());
+        } catch (error) {
+            console.log(error);
+        }
+    };
     return (
         <div className="p-3 max-w-lg mx-auto">
             <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -99,8 +143,15 @@ function Profile() {
             {success && <p className="text-green-600 mt-3 text-center">{success}</p>}
 
             <div className="flex justify-between mt-5">
-                <span className="text-red-700 cursor-pointer">Delete Account</span>
-                <span className="text-red-700 cursor-pointer">Sign Out</span>
+                <span
+                    onClick={handleDeleteAccount}
+                    className="text-red-700 cursor-pointer"
+                >
+                    Delete Account
+                </span>
+                <span onClick={handleSignOut} className="text-red-700 cursor-pointer">
+                    Sign Out
+                </span>
             </div>
         </div>
     );
