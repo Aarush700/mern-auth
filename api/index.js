@@ -9,15 +9,10 @@ dotenv.config();
 import userRoutes from "./routes/user.route.js";
 import authRoutes from "./routes/auth.route.js";
 
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => console.log("DATABASE connected!"))
-  .catch((err) => console.log(err));
-
-const __dirname = path.resolve();
 const app = express();
+const __dirname = path.resolve();
 
-// Parse JSON and cookies first
+// Middleware
 app.use(express.json());
 app.use(cookieParser());
 
@@ -26,11 +21,11 @@ app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 
 // Serve React static files
-app.use(express.static(path.join(__dirname, "/client/dist")));
+app.use(express.static(path.join(__dirname, "client/dist")));
 
-// Catch-all for React routing (must be last)
+// Catch-all for React routes (must be after API routes)
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
+  res.sendFile(path.join(__dirname, "client/dist/index.html"));
 });
 
 // Error handler
@@ -40,4 +35,10 @@ app.use((err, req, res, next) => {
   return res.status(statusCode).json({ success: false, message, statusCode });
 });
 
-app.listen(3000, () => console.log("Server is listening on port 3000."));
+// DB connection
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log("DATABASE connected!"))
+  .catch((err) => console.log(err));
+
+app.listen(3000, () => console.log("Server running on port 3000"));
